@@ -13,6 +13,7 @@
 #include "UnityEngine/GameObject.hpp"
 
 namespace Christmas::chLogo {
+    static BSML::FloatingScreen* cLogo = nullptr;
     static SafePtrUnity<UnityEngine::GameObject> logo;
 
     void DisableOriginalLogo();

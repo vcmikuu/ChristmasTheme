@@ -1,4 +1,7 @@
 #include "main.hpp"
+#include "CustomLogo/logo.hpp"
+
+#include "c.hpp"
 
 #include "scotland2/shared/modloader.h"
 
