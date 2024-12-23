@@ -1,5 +1,11 @@
 #include "main.hpp"
 #include "CustomLogo/logo.hpp"
+#include "Block/colorchanger.hpp"
+#include "GlobalNamespace/NoteController.hpp"
+#include "GlobalNamespace/GameNoteController.hpp"
+#include "UnityEngine/Time.hpp"
+#include "UnityEngine/Renderer.hpp"
+
 
 #include "c.hpp"
 
@@ -16,6 +22,37 @@ Configuration &getConfig() {
   static Configuration config(modInfo);
   return config;
 }
+
+static std::shared_ptr<cColor::ColorChanger> colorChanger;
+
+//MAKE_HOOK_MATCH(NoteControllerInit, &GlobalNamespace::NoteController::Init, void, GlobalNamespace::NoteController *self, GlobalNamespace::NoteData *noteData, float worldRotation, UnityEngine::Vector3 moveStartPos, UnityEngine::Vector3 moveEndPos, UnityEngine::Vector3 jumpEndPos, float moveDuration, float jumpDuration, float jumpGravity) {
+    //NoteControllerInit(self, noteData, worldRotation, moveStartPos, moveEndPos, jumpEndPos, moveDuration, jumpDuration, jumpGravity);
+
+    //if (colorChanger) {
+    //    colorChanger->UpdateColor(UnityEngine::Time::get_deltaTime());
+    //}
+
+    //auto renderers = self->GetComponentInChildren<UnityEngine::Renderer *>();
+    //if (renderers) {
+    //    for (auto m : renderers->get_materials()) {
+    //        m->SetColor("_SimpleColor", colorChanger->currentColor);
+     //       m->SetColor("_Color", colorChanger->currentColor);
+        //}
+    //}
+//}
+
+MAKE_HOOK_MATCH(NoteControllerInit, &GlobalNamespace::NoteController::Init, void, GlobalNamespace::NoteController* self, GlobalNamespace::NoteData* noteData, float worldRotation, UnityEngine::Vector3 moveStartPos, UnityEngine::Vector3 moveEndPos, UnityEngine::Vector3 jumpEndPos, float moveDuration, float jumpDuration, float jumpGravity, float endRotation, float uniformScale, bool rotatesTowardsPlayer, bool useRandomRotation) {
+    NoteControllerInit(self, noteData, worldRotation, moveStartPos, moveEndPos, jumpEndPos, moveDuration, jumpDuration, jumpGravity, endRotation, uniformScale, rotatesTowardsPlayer, useRandomRotation);
+    
+    if (colorChanger) colorChanger->UpdateColor(UnityEngine::Time::get_deltaTime());
+
+    auto renderers = self->GetComponentInChildren<UnityEngine::Renderer*>();
+    if (renderers) for (auto m : renderers->get_materials()) {
+        m->SetColor("_SimpleColor", colorChanger->currentColor);
+        m->SetColor("_Color", colorChanger->currentColor);
+    }
+}
+
 
 // Called at the early stages of game loading
 MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
@@ -34,6 +71,7 @@ MOD_EXTERN_FUNC void late_load() noexcept {
   il2cpp_functions::Init();
 
   PaperLogger.info("Installing hooks...");
+  INSTALL_HOOK(PaperLogger, NoteControllerInit);
 
   PaperLogger.info("Installed all hooks!");
 }
