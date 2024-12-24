@@ -27,15 +27,15 @@ namespace cColor {
             }
         }
 
-        auto gameObject = UnityEngine::GameObject::Find("BlockColorRenderer");
-        if (gameObject) {
-            auto renderer = gameObject->GetComponent<UnityEngine::Renderer*>();
-            if (renderer) {
-                auto material = renderer->get_material();
-                if (material) {
-                    material->set_color(currentColor);
-                }
-            }
-        }
+        //auto gameObject = UnityEngine::GameObject::Find("BlockColorRenderer");
+        //if (gameObject) {
+        //    auto renderer = gameObject->GetComponent<UnityEngine::Renderer*>();
+        //    if (renderer) {
+        //        auto material = renderer->get_material();
+        //        if (material) {
+        //            material->set_color(currentColor);
+        //        }
+        //    }
+        //}
     }
 }

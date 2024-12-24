@@ -94,12 +94,17 @@ MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_DidDeactivate, &GlobalNa
 MAKE_HOOK_MATCH(NoteControllerInit, &GlobalNamespace::NoteController::Init, void, GlobalNamespace::NoteController* self, GlobalNamespace::NoteData* noteData, float worldRotation, UnityEngine::Vector3 moveStartPos, UnityEngine::Vector3 moveEndPos, UnityEngine::Vector3 jumpEndPos, float moveDuration, float jumpDuration, float jumpGravity, float endRotation, float uniformScale, bool rotatesTowardsPlayer, bool useRandomRotation) {
     NoteControllerInit(self, noteData, worldRotation, moveStartPos, moveEndPos, jumpEndPos, moveDuration, jumpDuration, jumpGravity, endRotation, uniformScale, rotatesTowardsPlayer, useRandomRotation);
     
+    PaperLogger.info("Step 1 [124712]");
     if (colorChanger) colorChanger->UpdateColor(UnityEngine::Time::get_deltaTime());
 
     auto renderers = self->GetComponentInChildren<UnityEngine::Renderer*>();
+    PaperLogger.info("Step 2 [124712]");
     if (renderers) for (auto m : renderers->get_materials()) {
+        PaperLogger.info("Step 3 [124712]");
         m->SetColor("_SimpleColor", colorChanger->currentColor);
+        PaperLogger.info("Step 4 [124712]");
         m->SetColor("_Color", colorChanger->currentColor);
+        PaperLogger.info("Step 5 [124712]");
     }
 }
 
