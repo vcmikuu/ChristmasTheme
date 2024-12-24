@@ -1,8 +1,9 @@
 #include "main.hpp"
-#include "CustomLogo/logo.hpp"
+#include "Logo/customlogo.hpp"
 #include "Block/colorchanger.hpp"
 #include "GlobalNamespace/NoteController.hpp"
 #include "GlobalNamespace/GameNoteController.hpp"
+#include "GlobalNamespace/FlickeringNeonSign.hpp"
 #include "UnityEngine/Time.hpp"
 #include "UnityEngine/Renderer.hpp"
 
@@ -19,8 +20,8 @@ static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
 // other config tools such as config-utils don't use this config, so it can be
 // removed if those are in use
 Configuration &getConfig() {
-  static Configuration config(modInfo);
-  return config;
+    static Configuration config(modInfo);
+    return config;
 }
 
 static std::shared_ptr<cColor::ColorChanger> colorChanger;
@@ -53,25 +54,32 @@ MAKE_HOOK_MATCH(NoteControllerInit, &GlobalNamespace::NoteController::Init, void
     }
 }
 
+MAKE_HOOK_MATCH(CustomLogoInit, &GlobalNamespace::FlickeringNeonSign::Start, void, GlobalNamespace::FlickeringNeonSign* self) {
+    CustomLogoInit(self);
+
+    Christmas::customLogo::LoadCustomLogo();
+}
+
 
 // Called at the early stages of game loading
 MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
-  *info = modInfo.to_c();
+    *info = modInfo.to_c();
 
-  getConfig().Load();
+    getConfig().Load();
 
-  // File logging
-  Paper::Logger::RegisterFileContextId(PaperLogger.tag);
+    // File logging
+    Paper::Logger::RegisterFileContextId(PaperLogger.tag);
 
-  PaperLogger.info("Completed setup!");
+    PaperLogger.info("Completed setup!");
 }
 
 // Called later on in the game loading - a good time to install function hooks
 MOD_EXTERN_FUNC void late_load() noexcept {
-  il2cpp_functions::Init();
+    il2cpp_functions::Init();
 
-  PaperLogger.info("Installing hooks...");
-  INSTALL_HOOK(PaperLogger, NoteControllerInit);
+    PaperLogger.info("Installing hooks...");
+    INSTALL_HOOK(PaperLogger, NoteControllerInit);
+    INSTALL_HOOK(PaperLogger, CustomLogoInit);
 
-  PaperLogger.info("Installed all hooks!");
+    PaperLogger.info("Installed all hooks!");
 }

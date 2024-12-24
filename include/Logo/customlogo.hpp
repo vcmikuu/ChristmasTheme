@@ -12,12 +12,8 @@
 #include "UnityEngine/Vector2.hpp"
 #include "UnityEngine/GameObject.hpp"
 
-namespace Christmas::chLogo {
-    static BSML::FloatingScreen* cLogo = nullptr;
-    static SafePtrUnity<UnityEngine::GameObject> logo;
+namespace Christmas::customLogo {
 
-    void DisableOriginalLogo();
-    void LoadLogo();
-    void ReloadLogo();
+    void LoadCustomLogo();
 
 }
