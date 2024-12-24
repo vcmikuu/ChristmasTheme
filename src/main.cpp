@@ -8,6 +8,7 @@
 #include "GlobalNamespace/LightWithIdManager.hpp"
 #include "GlobalNamespace/MainMenuViewController.hpp"
 #include "Menu/ObjectInstances.hpp"
+#include "Menu/snowprimitives.hpp"
 #include "UnityEngine/Time.hpp"
 #include "UnityEngine/Renderer.hpp"
 #include "UnityEngine/SceneManagement/SceneManager.hpp"
@@ -16,6 +17,7 @@
 #include "Block/colorchanger.hpp"
 #include "Snowflakes/snowflakes.hpp"
 #include "Menu/customlogo.hpp"
+#include "Menu/snowprimitives.hpp"
 #include "Menu/music.hpp"
 
 
@@ -125,12 +127,13 @@ MAKE_HOOK_MATCH(OverrideEnvironmentColors, &GlobalNamespace::LightWithIdManager:
     else OverrideEnvironmentColors(self, lightId, color);
 }
 
-MAKE_HOOK_MATCH(SnowflakesInit, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    SnowflakesInit(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+MAKE_HOOK_MATCH(SnowInit, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    SnowInit(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     if(!firstActivation) return;
 
     Christmas::snowflakes::CreateSnowflakes();
+    Christmas::snowPrimitives::CreateSnowPrimitives();
 }
 
 
@@ -154,7 +157,7 @@ MOD_EXTERN_FUNC void late_load() noexcept {
     INSTALL_HOOK(PaperLogger, NoteControllerInit);
     INSTALL_HOOK(PaperLogger, CustomLogoInit);
     INSTALL_HOOK(PaperLogger, OverrideEnvironmentColors);
-    INSTALL_HOOK(PaperLogger, SnowflakesInit);
+    INSTALL_HOOK(PaperLogger, SnowInit);
 
     PaperLogger.info("Installed all hooks!");
 }

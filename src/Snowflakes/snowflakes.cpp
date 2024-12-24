@@ -21,13 +21,10 @@ namespace Christmas::snowflakes {
     SafePtrUnity<GameObject> snowflakesGo;
 
     void CreateSnowflakes() {
-        PaperLogger.info("Attempting to create snowflakes...");
         // Don't create if already created
         if(snowflakesGo) return;
         // Don't create if the template dust can't be found
         if(GameObject::Find("DustPS") == nullptr) return;
-
-        PaperLogger.info("Creating snowflakes!");
 
         // Create the snowflakes GameObject from the dust
         dustGo = GameObject::Find("DustPS");
