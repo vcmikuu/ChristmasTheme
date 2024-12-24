@@ -1,1 +1,32 @@
 <vertical preferred-width="130" pad-top='-0' anchor-min-y="1" child-control-height="false" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/RedBrumbler/Quest-BSML-Docs/gh-pages/schema.xsd'>
+    
+    <horizontal horizontal-fit='PreferredSize' pad='4' spacing='2' preferred-height='79' child-control-height='false'>
+        <vertical spacing='2'>
+            <vertical spacing="0" child-control-height='false' bg='panel-top' pad='2' pad-bottom='1' pad-top='1' preferred-width='64'>
+                <text text='&lt;color=#ffffff>🎄 Christmas Saber 🎄' align='Center' bold='true' font-size='5' font='Light' />
+            </vertical>
+        </vertical>
+    </horizontal>
+    
+    <horizontal horizontal-fit='PreferredSize' pad='4' spacing='2' preferred-height='79' child-control-height='false'>
+        <vertical spacing='2'>
+            <vertical spacing="0" child-control-height='false' bg='panel-top' pad='2' pad-bottom='1' pad-top='1' preferred-width='64'>
+                <text text='&lt;color=#ffffff>Settings' align='Center' bold='true' font-size='3.5' font='Light' size-delta-y='5' />
+                
+                <bool-setting text='Deactivate Custom Logo' value="deactivateCustomLogo" bind-value="true" apply-on-change="true" on-change="UpdateSettings" font='Light' />
+                <bool-setting text='Deactivate Custom Menu Music' value="deactivateCustomMenuMusic" bind-value="true" apply-on-change="true" on-change="UpdateSettings" font='Light' />
+                <bool-setting text='Deactivate Snow' value="deactivateSnow" bind-value="true" apply-on-change="true" on-change="UpdateSettings" font='Light' />
+                <bool-setting text='Deactivate Christmas blocks' value="deactivateChristmasBlocks" bind-value="true" apply-on-change="true" on-change="UpdateSettings" font='Light' />
+            </vertical>
+        </vertical>
+    </horizontal>
+
+    <horizontal horizontal-fit='PreferredSize' pad='4' spacing='2' preferred-height='79' child-control-height='false'>
+        <vertical spacing='2'>
+            <vertical spacing="0" child-control-height='false' bg='panel-top' pad='2' pad-bottom='1' pad-top='1' preferred-width='64'>
+                <text text='&lt;color=#ffffff>made by Furzz & laynia' align='Center' font-size='4' font='Light' />
+            </vertical>
+        </vertical>
+    </horizontal>
+
+</vertical>
