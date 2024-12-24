@@ -48,6 +48,7 @@ namespace IncludedAssets {
     DECLARE_FILE(jinglebells_ogg)
     DECLARE_FILE(logo_png)
     DECLARE_FILE(settings_xml)
+    DECLARE_FILE(snowflakes_png)
 }
 
 #undef DECLARE_FILE

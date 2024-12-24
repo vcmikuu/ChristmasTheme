@@ -6,6 +6,7 @@
 #include "GlobalNamespace/GameServerLobbyFlowCoordinator.hpp"
 #include "GlobalNamespace/MultiplayerModeSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/LightWithIdManager.hpp"
+#include "GlobalNamespace/MainMenuViewController.hpp"
 #include "Menu/ObjectInstances.hpp"
 #include "UnityEngine/Time.hpp"
 #include "UnityEngine/Renderer.hpp"
@@ -13,6 +14,7 @@
 #include "UnityEngine/SceneManagement/SceneManagement.hpp"
 
 #include "Block/colorchanger.hpp"
+#include "Snowflakes/snowflakes.hpp"
 #include "Menu/customlogo.hpp"
 #include "Menu/music.hpp"
 
@@ -123,6 +125,14 @@ MAKE_HOOK_MATCH(OverrideEnvironmentColors, &GlobalNamespace::LightWithIdManager:
     else OverrideEnvironmentColors(self, lightId, color);
 }
 
+MAKE_HOOK_MATCH(SnowflakesInit, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    SnowflakesInit(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
+    if(!firstActivation) return;
+
+    Christmas::snowflakes::CreateSnowflakes();
+}
+
 
 // Called at the early stages of game loading
 MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
@@ -144,6 +154,7 @@ MOD_EXTERN_FUNC void late_load() noexcept {
     INSTALL_HOOK(PaperLogger, NoteControllerInit);
     INSTALL_HOOK(PaperLogger, CustomLogoInit);
     INSTALL_HOOK(PaperLogger, OverrideEnvironmentColors);
+    INSTALL_HOOK(PaperLogger, SnowflakesInit);
 
     PaperLogger.info("Installed all hooks!");
 }
