@@ -1,16 +1,27 @@
 #include "main.hpp"
-#include "Logo/customlogo.hpp"
-#include "Block/colorchanger.hpp"
 #include "GlobalNamespace/NoteController.hpp"
 #include "GlobalNamespace/GameNoteController.hpp"
 #include "GlobalNamespace/FlickeringNeonSign.hpp"
+#include "GlobalNamespace/SongPreviewPlayer.hpp"
+#include "GlobalNamespace/GameServerLobbyFlowCoordinator.hpp"
+#include "GlobalNamespace/MultiplayerModeSelectionFlowCoordinator.hpp"
+#include "Menu/ObjectInstances.hpp"
 #include "UnityEngine/Time.hpp"
 #include "UnityEngine/Renderer.hpp"
+
+#include "Logo/customlogo.hpp"
+#include "Block/colorchanger.hpp"
+#include "Menu/music.hpp"
 
 
 #include "c.hpp"
 
 #include "scotland2/shared/modloader.h"
+
+
+using namespace cOGG;
+using namespace GlobalNamespace;
+
 
 static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
 // Stores the ID and version of our mod, and is sent to
@@ -25,6 +36,43 @@ Configuration &getConfig() {
 }
 
 static std::shared_ptr<cColor::ColorChanger> colorChanger;
+
+namespace cOGG::ObjectInstances {
+    GlobalNamespace::SongPreviewPlayer* SPP;
+}
+
+MAKE_HOOK_MATCH(SongPreviewPlayer_OnEnable, &GlobalNamespace::SongPreviewPlayer::OnEnable, void, GlobalNamespace::SongPreviewPlayer* self) {
+    cOGG::ObjectInstances::SPP = self;
+
+    MenuMusic::menuMusicLoader.set_OriginalClip(self->_defaultAudioClip);
+
+    self->_defaultAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+
+    SongPreviewPlayer_OnEnable(self);
+}
+
+MAKE_HOOK_MATCH(GameServerLobbyFlowCoordinator_DidActivate, &GlobalNamespace::GameServerLobbyFlowCoordinator::DidActivate, void, GlobalNamespace::GameServerLobbyFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    MenuMusic::menuMusicLoader.set_OriginalClip(self->_ambienceAudioClip);
+    
+    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+    GameServerLobbyFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+}
+
+MAKE_HOOK_MATCH(GameServerLobbyFlowCoordinator_DidDeactivate, &GlobalNamespace::GameServerLobbyFlowCoordinator::DidDeactivate, void, GlobalNamespace::GameServerLobbyFlowCoordinator* self, bool removedFromHierarchy, bool screenSystemDisabling) {
+    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+    GameServerLobbyFlowCoordinator_DidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
+}
+
+MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_DidActivate, &GlobalNamespace::MultiplayerModeSelectionFlowCoordinator::DidActivate, void, GlobalNamespace::MultiplayerModeSelectionFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+    MultiplayerModeSelectionFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+}
+
+MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_DidDeactivate, &GlobalNamespace::MultiplayerModeSelectionFlowCoordinator::DidDeactivate, void, GlobalNamespace::MultiplayerModeSelectionFlowCoordinator* self, bool removedFromHierarchy, bool screenSystemDisabling) {
+    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+    MultiplayerModeSelectionFlowCoordinator_DidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
+}
+
 
 //MAKE_HOOK_MATCH(NoteControllerInit, &GlobalNamespace::NoteController::Init, void, GlobalNamespace::NoteController *self, GlobalNamespace::NoteData *noteData, float worldRotation, UnityEngine::Vector3 moveStartPos, UnityEngine::Vector3 moveEndPos, UnityEngine::Vector3 jumpEndPos, float moveDuration, float jumpDuration, float jumpGravity) {
     //NoteControllerInit(self, noteData, worldRotation, moveStartPos, moveEndPos, jumpEndPos, moveDuration, jumpDuration, jumpGravity);
@@ -41,6 +89,7 @@ static std::shared_ptr<cColor::ColorChanger> colorChanger;
         //}
     //}
 //}
+
 
 MAKE_HOOK_MATCH(NoteControllerInit, &GlobalNamespace::NoteController::Init, void, GlobalNamespace::NoteController* self, GlobalNamespace::NoteData* noteData, float worldRotation, UnityEngine::Vector3 moveStartPos, UnityEngine::Vector3 moveEndPos, UnityEngine::Vector3 jumpEndPos, float moveDuration, float jumpDuration, float jumpGravity, float endRotation, float uniformScale, bool rotatesTowardsPlayer, bool useRandomRotation) {
     NoteControllerInit(self, noteData, worldRotation, moveStartPos, moveEndPos, jumpEndPos, moveDuration, jumpDuration, jumpGravity, endRotation, uniformScale, rotatesTowardsPlayer, useRandomRotation);
