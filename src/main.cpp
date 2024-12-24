@@ -5,9 +5,12 @@
 #include "GlobalNamespace/SongPreviewPlayer.hpp"
 #include "GlobalNamespace/GameServerLobbyFlowCoordinator.hpp"
 #include "GlobalNamespace/MultiplayerModeSelectionFlowCoordinator.hpp"
+#include "GlobalNamespace/LightWithIdManager.hpp"
 #include "Menu/ObjectInstances.hpp"
 #include "UnityEngine/Time.hpp"
 #include "UnityEngine/Renderer.hpp"
+#include "UnityEngine/SceneManagement/SceneManager.hpp"
+#include "UnityEngine/SceneManagement/SceneManagement.hpp"
 
 #include "Block/colorchanger.hpp"
 #include "Menu/customlogo.hpp"
@@ -114,6 +117,12 @@ MAKE_HOOK_MATCH(CustomLogoInit, &GlobalNamespace::FlickeringNeonSign::Start, voi
     Christmas::customLogo::LoadCustomLogo();
 }
 
+// Very quick and dirty way to override the menu light colors
+MAKE_HOOK_MATCH(OverrideEnvironmentColors, &GlobalNamespace::LightWithIdManager::SetColorForId, void, GlobalNamespace::LightWithIdManager* self, int lightId, UnityEngine::Color color) {
+    if(UnityEngine::SceneManagement::SceneManager::GetActiveScene().name != "GameCore") OverrideEnvironmentColors(self, lightId, UnityEngine::Color(1.0f, 1.0f, 1.0f, color.a));
+    else OverrideEnvironmentColors(self, lightId, color);
+}
+
 
 // Called at the early stages of game loading
 MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
@@ -134,6 +143,7 @@ MOD_EXTERN_FUNC void late_load() noexcept {
     PaperLogger.info("Installing hooks...");
     INSTALL_HOOK(PaperLogger, NoteControllerInit);
     INSTALL_HOOK(PaperLogger, CustomLogoInit);
+    INSTALL_HOOK(PaperLogger, OverrideEnvironmentColors);
 
     PaperLogger.info("Installed all hooks!");
 }
