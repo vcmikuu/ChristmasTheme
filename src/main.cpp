@@ -5,7 +5,6 @@
 #include "GlobalNamespace/NoteData.hpp"
 #include "GlobalNamespace/GameNoteController.hpp"
 #include "GlobalNamespace/FlickeringNeonSign.hpp"
-#include "GlobalNamespace/SongPreviewPlayer.hpp"
 #include "GlobalNamespace/GameServerLobbyFlowCoordinator.hpp"
 #include "GlobalNamespace/MultiplayerModeSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/LightWithIdManager.hpp"
@@ -15,6 +14,11 @@
 #include "Menu/ObjectInstances.hpp"
 #include "Menu/snowprimitives.hpp"
 
+#include "Audio/music.hpp"
+
+#include "GlobalNamespace/SongPreviewPlayer.hpp"
+#include "UnityEngine/AudioClip.hpp"
+#include "custom-types/shared/macros.hpp"
 
 #include "UnityEngine/Time.hpp"
 #include "UnityEngine/Renderer.hpp"
@@ -24,11 +28,12 @@
 #include "UnityEngine/Vector3.hpp"
 #include "UnityEngine/SpriteRenderer.hpp"
 
+
 #include "Block/colorchanger.hpp"
 #include "Snowflakes/snowflakes.hpp"
 #include "Menu/customlogo.hpp"
 #include "Menu/snowprimitives.hpp"
-#include "Menu/music.hpp"
+
 
 
 #include "c.hpp"
@@ -47,41 +52,64 @@ static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
 
 static std::shared_ptr<cColor::ColorChanger> colorChanger;
 
-namespace cOGG::ObjectInstances {
-    GlobalNamespace::SongPreviewPlayer* SPP;
-}
+//MAKE_HOOK_MATCH(SongPreviewPlayer_OnEnable, &GlobalNamespace::SongPreviewPlayer::OnEnable, void, GlobalNamespace::SongPreviewPlayer* self) {
+//
+//   MenuMusic::menuMusicLoader.set_OriginalClip(self->_defaultAudioClip);
+//
+//    if (!MenuMusic::menuMusicLoader.get_OriginalClip()) {
+//        PaperLogger.info("Loading custom menu music...");
+//        MenuMusic::menuMusicLoader.LoadCustomMusic();  // Keine Coroutine mehr nötig
+//    }
+//
+//    self->_defaultAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+//
+//    SongPreviewPlayer_OnEnable(self);
+//}
 
-MAKE_HOOK_MATCH(SongPreviewPlayer_OnEnable, &GlobalNamespace::SongPreviewPlayer::OnEnable, void, GlobalNamespace::SongPreviewPlayer* self) {
-    cOGG::ObjectInstances::SPP = self;
-
-    MenuMusic::menuMusicLoader.set_OriginalClip(self->_defaultAudioClip);
-
-    self->_defaultAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+MAKE_HOOK_MATCH(SongPreviewPlayer_OnEnable, &SongPreviewPlayer::OnEnable, void, SongPreviewPlayer* self) {
+    PaperLogger.info("1");
+    if (MenuMusic::menuMusicLoader.get_OriginalClip() == nullptr) {
+        PaperLogger.info("2");
+        MenuMusic::menuMusicLoader.LoadCustomMusic();
+        PaperLogger.info("3");
+    }
+    PaperLogger.info("4");
+    UnityEngine::AudioClip* audioClip = MenuMusic::menuMusicLoader.getClip();
+    PaperLogger.info("5");
+    if (audioClip != nullptr) {
+        PaperLogger.info("6");
+        MenuMusic::menuMusicLoader.LoadCustomMusic();
+        PaperLogger.info("7");
+        self->_defaultAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+        PaperLogger.info("8");
+    }
+    PaperLogger.info("9");
 
     SongPreviewPlayer_OnEnable(self);
+    PaperLogger.info("10");
 }
 
-MAKE_HOOK_MATCH(GameServerLobbyFlowCoordinator_DidActivate, &GlobalNamespace::GameServerLobbyFlowCoordinator::DidActivate, void, GlobalNamespace::GameServerLobbyFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    MenuMusic::menuMusicLoader.set_OriginalClip(self->_ambienceAudioClip);
-    
-    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
-    GameServerLobbyFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-}
+//MAKE_HOOK_MATCH(GameServerLobbyFlowCoordinator_DidActivate, &GlobalNamespace::GameServerLobbyFlowCoordinator::DidActivate, void, GlobalNamespace::GameServerLobbyFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+//    MenuMusic::menuMusicLoader.set_OriginalClip(self->_ambienceAudioClip);
+//    
+//    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+//    GameServerLobbyFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+//}
 
-MAKE_HOOK_MATCH(GameServerLobbyFlowCoordinator_DidDeactivate, &GlobalNamespace::GameServerLobbyFlowCoordinator::DidDeactivate, void, GlobalNamespace::GameServerLobbyFlowCoordinator* self, bool removedFromHierarchy, bool screenSystemDisabling) {
-    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
-    GameServerLobbyFlowCoordinator_DidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
-}
+//MAKE_HOOK_MATCH(GameServerLobbyFlowCoordinator_DidDeactivate, &GlobalNamespace::GameServerLobbyFlowCoordinator::DidDeactivate, void, GlobalNamespace::GameServerLobbyFlowCoordinator* self, bool removedFromHierarchy, bool screenSystemDisabling) {
+//   self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+//    GameServerLobbyFlowCoordinator_DidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
+//}
 
-MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_DidActivate, &GlobalNamespace::MultiplayerModeSelectionFlowCoordinator::DidActivate, void, GlobalNamespace::MultiplayerModeSelectionFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
-    MultiplayerModeSelectionFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-}
+//MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_DidActivate, &GlobalNamespace::MultiplayerModeSelectionFlowCoordinator::DidActivate, void, GlobalNamespace::MultiplayerModeSelectionFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+//    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+//    MultiplayerModeSelectionFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+//}
 
-MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_DidDeactivate, &GlobalNamespace::MultiplayerModeSelectionFlowCoordinator::DidDeactivate, void, GlobalNamespace::MultiplayerModeSelectionFlowCoordinator* self, bool removedFromHierarchy, bool screenSystemDisabling) {
-    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
-    MultiplayerModeSelectionFlowCoordinator_DidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
-}
+//MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_DidDeactivate, &GlobalNamespace::MultiplayerModeSelectionFlowCoordinator::DidDeactivate, void, GlobalNamespace::MultiplayerModeSelectionFlowCoordinator* self, bool removedFromHierarchy, bool screenSystemDisabling) {
+//    self->_ambienceAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
+//    MultiplayerModeSelectionFlowCoordinator_DidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
+//}
 
 
 //MAKE_HOOK_MATCH(NoteControllerInit, &GlobalNamespace::NoteController::Init, void, GlobalNamespace::NoteController *self, GlobalNamespace::NoteData *noteData, float worldRotation, UnityEngine::Vector3 moveStartPos, UnityEngine::Vector3 moveEndPos, UnityEngine::Vector3 jumpEndPos, float moveDuration, float jumpDuration, float jumpGravity) {
@@ -159,12 +187,12 @@ MOD_EXTERN_FUNC void late_load() noexcept {
     il2cpp_functions::Init();
 
     PaperLogger.info("Installing hooks...");
-    INSTALL_HOOK(PaperLogger, NoteControllerInit);
+    //INSTALL_HOOK(PaperLogger, NoteControllerInit);
     INSTALL_HOOK(PaperLogger, CustomLogoInit);
     INSTALL_HOOK(PaperLogger, OverrideEnvironmentColors);
     INSTALL_HOOK(PaperLogger, SnowInit);
 
-    //INSTALL_HOOK(PaperLogger, SongPreviewPlayer_OnEnable);
+    INSTALL_HOOK(PaperLogger, SongPreviewPlayer_OnEnable);
     //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidActivate);
     //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidDeactivate);
     //INSTALL_HOOK(PaperLogger, MultiplayerModeSelectionFlowCoordinator_DidActivate);
