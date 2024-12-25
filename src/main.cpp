@@ -1,5 +1,8 @@
 #include "main.hpp"
+
+
 #include "GlobalNamespace/NoteController.hpp"
+#include "GlobalNamespace/NoteData.hpp"
 #include "GlobalNamespace/GameNoteController.hpp"
 #include "GlobalNamespace/FlickeringNeonSign.hpp"
 #include "GlobalNamespace/SongPreviewPlayer.hpp"
@@ -7,12 +10,19 @@
 #include "GlobalNamespace/MultiplayerModeSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/LightWithIdManager.hpp"
 #include "GlobalNamespace/MainMenuViewController.hpp"
+
+
 #include "Menu/ObjectInstances.hpp"
 #include "Menu/snowprimitives.hpp"
+
+
 #include "UnityEngine/Time.hpp"
 #include "UnityEngine/Renderer.hpp"
 #include "UnityEngine/SceneManagement/SceneManager.hpp"
 #include "UnityEngine/SceneManagement/SceneManagement.hpp"
+#include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/Vector3.hpp"
+#include "UnityEngine/SpriteRenderer.hpp"
 
 #include "Block/colorchanger.hpp"
 #include "Snowflakes/snowflakes.hpp"
@@ -28,6 +38,7 @@
 
 using namespace cOGG;
 using namespace GlobalNamespace;
+using namespace UnityEngine;
 
 
 static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
@@ -100,35 +111,37 @@ MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_DidDeactivate, &GlobalNa
 
 MAKE_HOOK_MATCH(NoteControllerInit, &GlobalNamespace::NoteController::Init, void, GlobalNamespace::NoteController* self, GlobalNamespace::NoteData* noteData, float worldRotation, UnityEngine::Vector3 moveStartPos, UnityEngine::Vector3 moveEndPos, UnityEngine::Vector3 jumpEndPos, float moveDuration, float jumpDuration, float jumpGravity, float endRotation, float uniformScale, bool rotatesTowardsPlayer, bool useRandomRotation) {
     NoteControllerInit(self, noteData, worldRotation, moveStartPos, moveEndPos, jumpEndPos, moveDuration, jumpDuration, jumpGravity, endRotation, uniformScale, rotatesTowardsPlayer, useRandomRotation);
-    
-    PaperLogger.info("Step 1 [124712]");
+    if(!getModConfig().EnableBlocks.GetValue())
+		return;
+
     if (colorChanger) colorChanger->UpdateColor(UnityEngine::Time::get_deltaTime());
 
-    auto renderers = self->GetComponentInChildren<UnityEngine::Renderer*>();
-    PaperLogger.info("Step 2 [124712]");
-    if (renderers) for (auto m : renderers->get_materials()) {
-        PaperLogger.info("Step 3 [124712]");
-        m->SetColor("_SimpleColor", colorChanger->currentColor);
-        PaperLogger.info("Step 4 [124712]");
+
+    for(auto m : self->GetComponentInChildren<Renderer *>()->get_materials()) {
+        //m->SetColor("_SimpleColor", colorChanger->currentColor);
         m->SetColor("_Color", colorChanger->currentColor);
-        PaperLogger.info("Step 5 [124712]");
     }
 }
 
 MAKE_HOOK_MATCH(CustomLogoInit, &GlobalNamespace::FlickeringNeonSign::Start, void, GlobalNamespace::FlickeringNeonSign* self) {
     CustomLogoInit(self);
+    if(!getModConfig().EnableCustomLogo.GetValue())
+		return;
 
     Christmas::customLogo::LoadCustomLogo();
 }
 
 // Very quick and dirty way to override the menu light colors
 MAKE_HOOK_MATCH(OverrideEnvironmentColors, &GlobalNamespace::LightWithIdManager::SetColorForId, void, GlobalNamespace::LightWithIdManager* self, int lightId, UnityEngine::Color color) {
+    if(!getModConfig().EnableWhiteEnv.GetValue())
+		return;
     if(UnityEngine::SceneManagement::SceneManager::GetActiveScene().name != "GameCore") OverrideEnvironmentColors(self, lightId, UnityEngine::Color(1.0f, 1.0f, 1.0f, color.a));
     else OverrideEnvironmentColors(self, lightId, color);
 }
 
 MAKE_HOOK_MATCH(SnowInit, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     SnowInit(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
 
     if(!firstActivation) return;
 
@@ -154,10 +167,18 @@ MOD_EXTERN_FUNC void late_load() noexcept {
     il2cpp_functions::Init();
 
     PaperLogger.info("Installing hooks...");
-    INSTALL_HOOK(PaperLogger, NoteControllerInit);
+    //INSTALL_HOOK(PaperLogger, NoteControllerInit);
     INSTALL_HOOK(PaperLogger, CustomLogoInit);
     INSTALL_HOOK(PaperLogger, OverrideEnvironmentColors);
     INSTALL_HOOK(PaperLogger, SnowInit);
+
+    //INSTALL_HOOK(PaperLogger, SongPreviewPlayer_OnEnable);
+    //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidActivate);
+    //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidDeactivate);
+    //INSTALL_HOOK(PaperLogger, MultiplayerModeSelectionFlowCoordinator_DidActivate);
+    //INSTALL_HOOK(PaperLogger, MultiplayerModeSelectionFlowCoordinator_DidDeactivate);
+
+
 
     PaperLogger.info("Installed all hooks!");
 }
