@@ -159,7 +159,7 @@ MOD_EXTERN_FUNC void late_load() noexcept {
     il2cpp_functions::Init();
 
     PaperLogger.info("Installing hooks...");
-    //INSTALL_HOOK(PaperLogger, NoteControllerInit);
+    INSTALL_HOOK(PaperLogger, NoteControllerInit);
     INSTALL_HOOK(PaperLogger, CustomLogoInit);
     INSTALL_HOOK(PaperLogger, OverrideEnvironmentColors);
     INSTALL_HOOK(PaperLogger, SnowInit);

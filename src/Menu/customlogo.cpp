@@ -43,9 +43,13 @@ namespace Christmas::customLogo {
         christmasLogo = UnityEngine::GameObject::New_ctor("ChristmasLogo");
         christmasLogo->transform->SetParent(UnityEngine::GameObject::Find("DefaultMenuEnvironment")->transform);
         christmasLogo->transform->position = UnityEngine::Vector3(0.0f, 16.6f, 26.1f);
-        // Set the texture of the custom logo
-        UnityEngine::SpriteRenderer* spriteRenderer = christmasLogo->AddComponent<UnityEngine::SpriteRenderer*>();
-        spriteRenderer->sprite = BSML::Utilities::LoadSpriteRaw(static_cast<ArrayW<uint8_t>>(IncludedAssets::logo_png), 32.0f);
+        // Create the image for the custom logo
+        UnityEngine::GameObject* logoCanvas = BSML::Lite::CreateCanvas();
+        logoCanvas->name = "LogoCanvas";
+        logoCanvas->transform->parent = christmasLogo->transform;
+        logoCanvas->transform->localPosition = UnityEngine::Vector3(0.0f, 0.0f, 0.0f);
+        UnityEngine::GameObject* logoImage = BSML::Lite::CreateImage(logoCanvas, BSML::Utilities::LoadSpriteRaw(static_cast<ArrayW<uint8_t>>(IncludedAssets::logo_png)), UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector2(960.0f, 384.0f))->gameObject;
+        logoImage->name = "LogoImage";
 
         // Fill the gap where the sparking E glow used to be
         UnityEngine::GameObject* replacementENeon = UnityEngine::GameObject::Instantiate(eNeon->gameObject);
