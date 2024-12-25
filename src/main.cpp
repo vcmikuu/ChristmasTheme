@@ -45,14 +45,6 @@ static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
 // Stores the ID and version of our mod, and is sent to
 // the modloader upon startup
 
-// Loads the config from disk using our modInfo, then returns it for use
-// other config tools such as config-utils don't use this config, so it can be
-// removed if those are in use
-Configuration &getConfig() {
-    static Configuration config(modInfo);
-    return config;
-}
-
 static std::shared_ptr<cColor::ColorChanger> colorChanger;
 
 namespace cOGG::ObjectInstances {
@@ -133,10 +125,10 @@ MAKE_HOOK_MATCH(CustomLogoInit, &GlobalNamespace::FlickeringNeonSign::Start, voi
 
 // Very quick and dirty way to override the menu light colors
 MAKE_HOOK_MATCH(OverrideEnvironmentColors, &GlobalNamespace::LightWithIdManager::SetColorForId, void, GlobalNamespace::LightWithIdManager* self, int lightId, UnityEngine::Color color) {
-    if(!getModConfig().EnableWhiteEnv.GetValue())
-		return;
-    if(UnityEngine::SceneManagement::SceneManager::GetActiveScene().name != "GameCore") OverrideEnvironmentColors(self, lightId, UnityEngine::Color(1.0f, 1.0f, 1.0f, color.a));
-    else OverrideEnvironmentColors(self, lightId, color);
+    if(!getModConfig().EnableWhiteEnv.GetValue() || UnityEngine::SceneManagement::SceneManager::GetActiveScene().name == "GameCore")
+        OverrideEnvironmentColors(self, lightId, color);
+    else
+        OverrideEnvironmentColors(self, lightId, UnityEngine::Color(1.0f, 1.0f, 1.0f, color.a));
 }
 
 MAKE_HOOK_MATCH(SnowInit, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
@@ -154,7 +146,7 @@ MAKE_HOOK_MATCH(SnowInit, &GlobalNamespace::MainMenuViewController::DidActivate,
 MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
     *info = modInfo.to_c();
 
-    getConfig().Load();
+    getModConfig().Init(modInfo);
 
     // File logging
     Paper::Logger::RegisterFileContextId(PaperLogger.tag);
