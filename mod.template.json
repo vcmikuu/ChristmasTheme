@@ -12,5 +12,22 @@
   "modFiles": ["${binary}"],
 
   "libraryFiles": [],
-  "fileCopies": []
+  "fileCopies": [
+    {
+      "name": "carolofthebells.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Christmas/carolofthebells.ogg"
+    },
+    {
+      "name": "christmasspirit.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Christmas/christmasspirit.ogg"
+    },
+    {
+      "name": "deckthehalls.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Christmas/deckthehalls.ogg"
+    },
+    {
+      "name": "jinglebells.ogg",
+      "destination": "/sdcard/ModData/com.beatgames.beatsaber/Mods/Christmas/jinglebells.ogg"
+    }
+  ]
 }

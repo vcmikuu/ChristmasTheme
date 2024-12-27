@@ -117,17 +117,19 @@ namespace MenuMusic {
     void MusicLoader::InitializeSongs() {
         songData.clear();
 
-        songData.emplace_back(to_base64(std::vector<uint8_t>(static_cast<ArrayW<uint8_t>>(IncludedAssets::carolofthebells_ogg).begin(),
-                                                          static_cast<ArrayW<uint8_t>>(IncludedAssets::carolofthebells_ogg).end())));
+        // Just disabled this code for now so the mod can build
 
-        songData.emplace_back(to_base64(std::vector<uint8_t>(static_cast<ArrayW<uint8_t>>(IncludedAssets::christmasspirit_ogg).begin(),
-                                                          static_cast<ArrayW<uint8_t>>(IncludedAssets::christmasspirit_ogg).end())));
+        // songData.emplace_back(to_base64(std::vector<uint8_t>(static_cast<ArrayW<uint8_t>>(IncludedAssets::carolofthebells_ogg).begin(),
+        //                                                   static_cast<ArrayW<uint8_t>>(IncludedAssets::carolofthebells_ogg).end())));
 
-        songData.emplace_back(to_base64(std::vector<uint8_t>(static_cast<ArrayW<uint8_t>>(IncludedAssets::deckthehalls_ogg).begin(),
-                                                          static_cast<ArrayW<uint8_t>>(IncludedAssets::deckthehalls_ogg).end())));
+        // songData.emplace_back(to_base64(std::vector<uint8_t>(static_cast<ArrayW<uint8_t>>(IncludedAssets::christmasspirit_ogg).begin(),
+        //                                                   static_cast<ArrayW<uint8_t>>(IncludedAssets::christmasspirit_ogg).end())));
 
-        songData.emplace_back(to_base64(std::vector<uint8_t>(static_cast<ArrayW<uint8_t>>(IncludedAssets::jinglebells_ogg).begin(),
-                                                          static_cast<ArrayW<uint8_t>>(IncludedAssets::jinglebells_ogg).end())));
+        // songData.emplace_back(to_base64(std::vector<uint8_t>(static_cast<ArrayW<uint8_t>>(IncludedAssets::deckthehalls_ogg).begin(),
+        //                                                   static_cast<ArrayW<uint8_t>>(IncludedAssets::deckthehalls_ogg).end())));
+
+        // songData.emplace_back(to_base64(std::vector<uint8_t>(static_cast<ArrayW<uint8_t>>(IncludedAssets::jinglebells_ogg).begin(),
+        //                                                   static_cast<ArrayW<uint8_t>>(IncludedAssets::jinglebells_ogg).end())));
     }
 
     void MusicLoader::LoadCustomMusic() {
