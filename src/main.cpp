@@ -14,7 +14,7 @@
 
 #include "Menu/ObjectInstances.hpp"
 
-#include "Audio/music.hpp"
+#include "Audio/player.hpp"
 
 #include "GlobalNamespace/SongPreviewPlayer.hpp"
 #include "UnityEngine/AudioClip.hpp"
@@ -42,7 +42,6 @@
 #include "scotland2/shared/modloader.h"
 
 
-using namespace cOGG;
 using namespace GlobalNamespace;
 using namespace UnityEngine;
 
@@ -67,6 +66,11 @@ static std::shared_ptr<cColor::ColorChanger> colorChanger;
 //    SongPreviewPlayer_OnEnable(self);
 //}
 
+MAKE_HOOK_MATCH(SongPreviewPlayer_OnEnable, &SongPreviewPlayer::OnEnable, void, SongPreviewPlayer* self) {
+    PlayRandomSong(self);
+    SongPreviewPlayer_OnEnable(self);
+}
+
 // float BytesToFloat(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
 //     float out = 0;
 //     uint8_t* tempPtr = reinterpret_cast<uint8_t*>(&out);
@@ -79,82 +83,6 @@ static std::shared_ptr<cColor::ColorChanger> colorChanger;
 
 //     return out;
 // }
-
-MAKE_HOOK_MATCH(SongPreviewPlayer_OnEnable, &SongPreviewPlayer::OnEnable, void, SongPreviewPlayer* self) {
-    // Haha this produces eldritch horrors
-    // UnityEngine::AudioClip* audioClip = self->_defaultAudioClip;
-    
-    // ArrayW<uint8_t> rawAudioData = static_cast<ArrayW<uint8_t>>(IncludedAssets::carolofthebells_wav);
-    // PaperLogger.info("rawAudioData size: {}", rawAudioData.size());
-
-    // ArrayW<float> audioData = ArrayW<float>(rawAudioData.size() / 4);
-    // for(int i = 0; i < rawAudioData.size() / 4; i++) {
-    //     audioData[i] = BytesToFloat(
-    //         rawAudioData[i * 4 + 0],
-    //         rawAudioData[i * 4 + 1],
-    //         rawAudioData[i * 4 + 2],
-    //         rawAudioData[i * 4 + 3]
-    //     );
-    // }
-    // PaperLogger.info("audioData size: {}", audioData.size());
-
-    // PaperLogger.info("Creating AudioClip");
-    // audioClip = UnityEngine::AudioClip::Create("ChristmasMusic", rawAudioData.size(), 2, 44100, false);
-    // PaperLogger.info("Setting AudioClip data");
-    // bool successful = audioClip->SetData(audioData, 0);
-    // PaperLogger.info("Successful: {}", successful);
-
-    // PaperLogger.info("Setting defaultAudioClip");
-    // self->_defaultAudioClip = audioClip;
-
-
-    // Song file is stored on the headset, location determined in mod.template.json
-    std::string filePath = "/sdcard/ModData/com.beatgames.beatsaber/Mods/Christmas/carolofthebells.ogg";
-
-    if(!fileexists(filePath)) {
-        PaperLogger.info("Could not find {}", filePath);
-        SongPreviewPlayer_OnEnable(self);
-        return;
-    }
-    
-    // Thanks QuestSounds https://github.com/EnderdracheLP/QuestSounds/blob/5e991ebebff839d7d8814b16434a1301b2fa9bee/src/Utils/AsyncAudioClipLoader.cpp#L90C9-L90C113
-    auto loadAudioFileTask = GlobalNamespace::MediaAsyncLoader::New_ctor()->LoadAudioClipFromFilePathAsync(filePath);
-
-    loadAudioFileTask->GetAwaiter().OnCompleted(custom_types::MakeDelegate<System::Action*>(std::function([self, filePath, loadAudioFileTask]()
-    {
-        PaperLogger.info("Finished loading {}", filePath);
-        self->_defaultAudioClip = loadAudioFileTask->get_Result();
-    })));
-
-    SongPreviewPlayer_OnEnable(self);
-
-    
-
-    // ArrayW<float_t> data;
-    // audioClip->GetData(data, 0);
-    // PaperLogger.info("Data size: {}", data.size());
-    
-    // PaperLogger.info("SPP 1");
-    // if (MenuMusic::menuMusicLoader.get_OriginalClip() == nullptr) {
-    //     PaperLogger.info("SPP 2");
-    //     MenuMusic::menuMusicLoader.LoadCustomMusic();
-    //     PaperLogger.info("SPP 3");
-    // }
-    // PaperLogger.info("SPP 4");
-    // UnityEngine::AudioClip* audioClip = MenuMusic::menuMusicLoader.getClip();
-    // PaperLogger.info("SPP 5");
-    // if (audioClip != nullptr) {
-    //     PaperLogger.info("SPP 6");
-    //     MenuMusic::menuMusicLoader.LoadCustomMusic();
-    //     PaperLogger.info("SPP 7");
-    //     self->_defaultAudioClip = MenuMusic::menuMusicLoader.get_OriginalClip();
-    //     PaperLogger.info("SPP 8");
-    // }
-    // PaperLogger.info("SPP 9");
-
-    // SongPreviewPlayer_OnEnable(self);
-    // PaperLogger.info("SPP 10");
-}
 
 //MAKE_HOOK_MATCH(GameServerLobbyFlowCoordinator_DidActivate, &GlobalNamespace::GameServerLobbyFlowCoordinator::DidActivate, void, GlobalNamespace::GameServerLobbyFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
 //    MenuMusic::menuMusicLoader.set_OriginalClip(self->_ambienceAudioClip);
@@ -252,6 +180,7 @@ MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
 // Called later on in the game loading - a good time to install function hooks
 MOD_EXTERN_FUNC void late_load() noexcept {
     il2cpp_functions::Init();
+
 
     PaperLogger.info("Installing hooks...");
     //INSTALL_HOOK(PaperLogger, NoteControllerInit);
