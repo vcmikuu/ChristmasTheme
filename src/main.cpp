@@ -17,6 +17,7 @@
 #include "Audio/player.hpp"
 
 #include "GlobalNamespace/SongPreviewPlayer.hpp"
+#include "UnityEngine/AudioSource.hpp"
 #include "UnityEngine/AudioClip.hpp"
 #include "custom-types/shared/macros.hpp"
 
@@ -66,9 +67,17 @@ static std::shared_ptr<cColor::ColorChanger> colorChanger;
 //    SongPreviewPlayer_OnEnable(self);
 //}
 
+// Called whenever the main menu scene loads
 MAKE_HOOK_MATCH(SongPreviewPlayer_OnEnable, &SongPreviewPlayer::OnEnable, void, SongPreviewPlayer* self) {
     PlayRandomSong(self);
     SongPreviewPlayer_OnEnable(self);
+}
+
+// Called whenever the SongPreviewPlayer transitions from one song to another
+MAKE_HOOK_MATCH(SongPreviewPlayer_CrossfadeTo, static_cast<void(SongPreviewPlayer::*)(AudioClip*, float, float, float, bool, System::Action*)>(&SongPreviewPlayer::CrossfadeTo), void, SongPreviewPlayer* self, AudioClip* audioClip, float musicVolume, float startTime, float duration, bool isDefault, System::Action* onFadeOutCallback) {
+    // Choose a new random main menu song when transitioning away from the main menu music
+    if(self->_defaultAudioClip && self->_defaultAudioClip.ptr() != audioClip) PlayRandomSong(self);
+    SongPreviewPlayer_CrossfadeTo(self, audioClip, musicVolume, startTime, duration, isDefault, onFadeOutCallback);
 }
 
 // float BytesToFloat(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
@@ -189,6 +198,7 @@ MOD_EXTERN_FUNC void late_load() noexcept {
     INSTALL_HOOK(PaperLogger, SnowInit);
 
     INSTALL_HOOK(PaperLogger, SongPreviewPlayer_OnEnable);
+    INSTALL_HOOK(PaperLogger, SongPreviewPlayer_CrossfadeTo);
     //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidActivate);
     //INSTALL_HOOK(PaperLogger, GameServerLobbyFlowCoordinator_DidDeactivate);
     //INSTALL_HOOK(PaperLogger, MultiplayerModeSelectionFlowCoordinator_DidActivate);
