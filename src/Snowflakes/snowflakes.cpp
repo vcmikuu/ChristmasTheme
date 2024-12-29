@@ -4,6 +4,7 @@
 
 #include "Snowflakes/particleController.hpp"
 
+#include "UnityEngine/Resources.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Quaternion.hpp"
 #include "UnityEngine/ParticleSystemRenderer.hpp"
@@ -24,7 +25,19 @@ namespace Christmas::snowflakes {
         // Don't create if already created
         if(snowflakesGo) return;
         // Don't create if the template dust can't be found
-        if(GameObject::Find("DustPS") == nullptr) return;
+
+        for (auto particle : UnityEngine::Resources::FindObjectsOfTypeAll<UnityEngine::ParticleSystem*>())
+        {
+            if (particle->get_name() == "DustPS")
+            {
+                dustGo = particle->get_gameObject();
+                break;
+            }
+        }
+
+        if(!dustGo) return;
+
+        dustGo->set_active(false);
 
         // Create the snowflakes GameObject from the dust
         dustGo = GameObject::Find("DustPS");
