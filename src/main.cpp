@@ -51,7 +51,7 @@ static modloader::ModInfo modInfo{MOD_ID, VERSION, 0};
 // Stores the ID and version of our mod, and is sent to
 // the modloader upon startup
 
-static std::shared_ptr<cColor::ColorChanger> colorChanger;
+// static std::shared_ptr<cColor::ColorChanger> colorChanger;
 
 //MAKE_HOOK_MATCH(SongPreviewPlayer_OnEnable, &GlobalNamespace::SongPreviewPlayer::OnEnable, void, GlobalNamespace::SongPreviewPlayer* self) {
 //
@@ -69,14 +69,14 @@ static std::shared_ptr<cColor::ColorChanger> colorChanger;
 
 // Called whenever the main menu scene loads
 MAKE_HOOK_MATCH(SongPreviewPlayer_OnEnable, &SongPreviewPlayer::OnEnable, void, SongPreviewPlayer* self) {
-    PlayRandomSong(self);
+    if(getModConfig().EnableMenuMusic.GetValue()) PlayRandomSong(self);
     SongPreviewPlayer_OnEnable(self);
 }
 
 // Called whenever the SongPreviewPlayer transitions from one song to another
 MAKE_HOOK_MATCH(SongPreviewPlayer_CrossfadeTo, static_cast<void(SongPreviewPlayer::*)(AudioClip*, float, float, float, bool, System::Action*)>(&SongPreviewPlayer::CrossfadeTo), void, SongPreviewPlayer* self, AudioClip* audioClip, float musicVolume, float startTime, float duration, bool isDefault, System::Action* onFadeOutCallback) {
     // Choose a new random main menu song when transitioning away from the main menu music
-    if(self->_defaultAudioClip && self->_defaultAudioClip.ptr() != audioClip) PlayRandomSong(self);
+    if(getModConfig().EnableMenuMusic.GetValue() && self->_defaultAudioClip && self->_defaultAudioClip.ptr() != audioClip) PlayRandomSong(self);
     SongPreviewPlayer_CrossfadeTo(self, audioClip, musicVolume, startTime, duration, isDefault, onFadeOutCallback);
 }
 
@@ -133,44 +133,43 @@ MAKE_HOOK_MATCH(SongPreviewPlayer_CrossfadeTo, static_cast<void(SongPreviewPlaye
 //}
 
 
-MAKE_HOOK_MATCH(NoteControllerInit, &GlobalNamespace::NoteController::Init, void, GlobalNamespace::NoteController* self, GlobalNamespace::NoteData* noteData, float worldRotation, UnityEngine::Vector3 moveStartPos, UnityEngine::Vector3 moveEndPos, UnityEngine::Vector3 jumpEndPos, float moveDuration, float jumpDuration, float jumpGravity, float endRotation, float uniformScale, bool rotatesTowardsPlayer, bool useRandomRotation) {
-    NoteControllerInit(self, noteData, worldRotation, moveStartPos, moveEndPos, jumpEndPos, moveDuration, jumpDuration, jumpGravity, endRotation, uniformScale, rotatesTowardsPlayer, useRandomRotation);
-    if(!getModConfig().EnableBlocks.GetValue())
-		return;
+// MAKE_HOOK_MATCH(NoteControllerInit, &GlobalNamespace::NoteController::Init, void, GlobalNamespace::NoteController* self, GlobalNamespace::NoteData* noteData, float worldRotation, UnityEngine::Vector3 moveStartPos, UnityEngine::Vector3 moveEndPos, UnityEngine::Vector3 jumpEndPos, float moveDuration, float jumpDuration, float jumpGravity, float endRotation, float uniformScale, bool rotatesTowardsPlayer, bool useRandomRotation) {
+//     NoteControllerInit(self, noteData, worldRotation, moveStartPos, moveEndPos, jumpEndPos, moveDuration, jumpDuration, jumpGravity, endRotation, uniformScale, rotatesTowardsPlayer, useRandomRotation);
+//     if(!getModConfig().EnableBlocks.GetValue())
+// 		return;
 
-    if (colorChanger) colorChanger->UpdateColor(UnityEngine::Time::get_deltaTime());
+//     if (colorChanger) colorChanger->UpdateColor(UnityEngine::Time::get_deltaTime());
 
 
-    for(auto m : self->GetComponentInChildren<Renderer *>()->get_materials()) {
-        //m->SetColor("_SimpleColor", colorChanger->currentColor);
-        m->SetColor("_Color", colorChanger->currentColor);
-    }
-}
+//     for(auto m : self->GetComponentInChildren<Renderer *>()->get_materials()) {
+//         //m->SetColor("_SimpleColor", colorChanger->currentColor);
+//         m->SetColor("_Color", colorChanger->currentColor);
+//     }
+// }
 
 MAKE_HOOK_MATCH(CustomLogoInit, &GlobalNamespace::FlickeringNeonSign::Start, void, GlobalNamespace::FlickeringNeonSign* self) {
     CustomLogoInit(self);
-    if(!getModConfig().EnableCustomLogo.GetValue())
-		return;
 
-    Christmas::customLogo::LoadCustomLogo();
+    if(getModConfig().EnableCustomLogo.GetValue()) Christmas::customLogo::LoadCustomLogo();
 }
 
 // Very quick and dirty way to override the menu light colors
 MAKE_HOOK_MATCH(OverrideEnvironmentColors, &GlobalNamespace::LightWithIdManager::SetColorForId, void, GlobalNamespace::LightWithIdManager* self, int lightId, UnityEngine::Color color) {
     if(!getModConfig().EnableWhiteEnv.GetValue() || UnityEngine::SceneManagement::SceneManager::GetActiveScene().name == "GameCore")
         OverrideEnvironmentColors(self, lightId, color);
-    else
+    else {
+        // Force the environment color to be white
         OverrideEnvironmentColors(self, lightId, UnityEngine::Color(1.0f, 1.0f, 1.0f, color.a));
+    }
 }
 
 MAKE_HOOK_MATCH(SnowInit, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     SnowInit(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
-
     if(!firstActivation) return;
 
-    Christmas::snowflakes::CreateSnowflakes();
-    Christmas::snowPrimitives::CreateSnowPrimitives();
+    if(getModConfig().EnableSnowflakes.GetValue()) Christmas::snowflakes::CreateSnowflakes();
+    if(getModConfig().EnableSnowPiles.GetValue()) Christmas::snowPrimitives::CreateSnowPrimitives();
 }
 
 
