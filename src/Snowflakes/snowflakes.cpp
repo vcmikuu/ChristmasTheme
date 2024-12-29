@@ -24,24 +24,20 @@ namespace Christmas::snowflakes {
     void CreateSnowflakes() {
         // Don't create if already created
         if(snowflakesGo) return;
-        // Don't create if the template dust can't be found
 
-        for (auto particle : UnityEngine::Resources::FindObjectsOfTypeAll<UnityEngine::ParticleSystem*>())
-        {
-            if (particle->get_name() == "DustPS")
-            {
-                dustGo = particle->get_gameObject();
+        // Find the dust GameObject for a template ParticleSystem
+        if(!dustGo) for (auto particle : Resources::FindObjectsOfTypeAll<ParticleSystem*>())
+            if (particle->name == "DustPS") {
+                dustGo = particle->gameObject;
                 break;
             }
-        }
 
+        // If the template dust wasn't found, don't create the snow
         if(!dustGo) return;
 
-        dustGo->set_active(false);
 
         // Create the snowflakes GameObject from the dust
-        dustGo = GameObject::Find("DustPS");
-        dustGo->active = false;
+        dustGo->active = false; // Dust and snow at the same time looks busy, so 
         snowflakesGo = GameObject::Instantiate(dustGo->gameObject);
         snowflakesGo->name = "SnowflakePS";
         snowflakesGo->active = true;
