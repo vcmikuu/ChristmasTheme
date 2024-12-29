@@ -48,6 +48,7 @@ namespace Christmas::snowflakes {
         ParticleController::MainModule::set_startSize(snowflakes, 0.05);
         ParticleController::MainModule::set_maxParticles(snowflakes, 100000);
         ParticleController::MainModule::set_gravityModifier(snowflakes, 0.1f);
+        ParticleController::EmissionModule::set_enabled(snowflakes, true); // ParticleTuner compatibility
         ParticleController::EmissionModule::set_rateOverTime(snowflakes, 1000);
         ParticleController::ShapeModule::set_shapeType(snowflakes, ParticleController::ShapeType::Box);
         ParticleController::ShapeModule::set_position(snowflakes, UnityEngine::Vector3(0.0f, 0.0f, 0.0f));
