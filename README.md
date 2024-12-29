@@ -2,6 +2,10 @@
 
 Turn your Beat Saber into a christmas wonderland!
 
+Made by CatsaCode and laynia
+
+Sorry it's late
+
 Use `qpm s build` to build
 Same goes for `qpm s copy` and `qpm s qmod`
 
