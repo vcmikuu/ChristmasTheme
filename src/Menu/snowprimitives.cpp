@@ -11,7 +11,7 @@
 #include "UnityEngine/MeshRenderer.hpp"
 #include "UnityEngine/Material.hpp"
 
-using namespace GlobalNamespace;
+//using namespace GlobalNamespace;
 using namespace UnityEngine;
 
 namespace Christmas::snowPrimitives {

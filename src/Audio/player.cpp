@@ -1,6 +1,5 @@
 #include "Audio/player.hpp"
 #include "main.hpp"
-#include "paper/shared/logger.hpp"
 
 #include "GlobalNamespace/MediaAsyncLoader.hpp"
 

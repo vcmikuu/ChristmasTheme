@@ -11,6 +11,7 @@
 #include "GlobalNamespace/MainMenuViewController.hpp"
 #include "GlobalNamespace/MediaAsyncLoader.hpp"
 
+#include "logging.hpp"
 
 #include "Menu/ObjectInstances.hpp"
 
@@ -182,7 +183,7 @@ MOD_EXTERN_FUNC void setup(CModInfo *info) noexcept {
     // File logging
     Paper::Logger::RegisterFileContextId(PaperLogger.tag);
 
-    PaperLogger.info("Completed setup!");
+    INFO("Completed setup!");
 }
 
 // Called later on in the game loading - a good time to install function hooks
@@ -190,7 +191,7 @@ MOD_EXTERN_FUNC void late_load() noexcept {
     il2cpp_functions::Init();
 
 
-    PaperLogger.info("Installing hooks...");
+    INFO("Installing hooks...");
     //INSTALL_HOOK(PaperLogger, NoteControllerInit);
     INSTALL_HOOK(PaperLogger, CustomLogoInit);
     INSTALL_HOOK(PaperLogger, OverrideEnvironmentColors);
@@ -205,5 +206,5 @@ MOD_EXTERN_FUNC void late_load() noexcept {
 
 
 
-    PaperLogger.info("Installed all hooks!");
+    INFO("Installed all hooks!");
 }
