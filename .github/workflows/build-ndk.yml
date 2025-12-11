@@ -113,7 +113,7 @@ jobs:
           restore: true
           resolve_ndk: true
           cache: true
-          version: version@1.*
+          qpm_version: version@1.*
 
       - name: Build & Create Qmod
         run: |
