@@ -1,5 +1,4 @@
 {
-  "$schema": "https://raw.githubusercontent.com/QuestPackageManager/QPM.Package/refs/heads/main/qpm.shared.schema.json",
   "config": {
     "version": "0.1.0",
     "sharedDir": "shared",
@@ -7,7 +6,7 @@
     "info": {
       "name": "Christmas",
       "id": "christmas",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "url": null,
       "additionalData": {
         "overrideSoName": "libchristmas.so",
@@ -42,7 +41,7 @@
           "pwsh ./scripts/pull-tombstone.ps1"
         ]
       },
-      "ndk": "^27.2.12479018",
+      "ndk": "^27.3.13750724",
       "qmodIncludeDirs": [
         "./build",
         "./extern/libs"

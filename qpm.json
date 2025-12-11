@@ -5,7 +5,7 @@
   "info": {
     "name": "Christmas",
     "id": "christmas",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "url": null,
     "additionalData": {
       "overrideSoName": "libchristmas.so",
@@ -38,7 +38,7 @@
         "pwsh ./scripts/pull-tombstone.ps1"
       ]
     },
-    "ndk": "^27.2.12479018",
+    "ndk": "^27.3.13750724",
     "qmodIncludeDirs": ["./build", "./extern/libs"],
     "qmodOutput": "./Christmas.qmod"
   },
